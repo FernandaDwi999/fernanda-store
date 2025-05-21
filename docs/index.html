@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" x-data="store()" class="bg-gray-100">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LAfern - E-Commerce</title>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white shadow p-4 flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-2xl font-bold text-blue-600">LAfern<span class="text-black">Store</span></h1>
+        <div class="relative">
+            <button @click="cartOpen = !cartOpen" class="relative text-xl">
+                🛒
+                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full"
+                    x-text="cart.length"></span>
+            </button>
+
+            <!-- Cart Dropdown -->
+            <div x-cloak x-show="cartOpen" x-transition @click.outside="cartOpen = false"
+                class="absolute right-0 mt-3 w-80 bg-white border rounded shadow-lg p-4 z-50">
+                <h2 class="font-bold text-lg mb-2">Keranjang</h2>
+                <template x-if="cart.length === 0">
+                    <p class="text-sm text-gray-500">Keranjang kosong.</p>
+                </template>
+                <template x-for="(item, index) in cart" :key="index">
+                    <div class="flex justify-between items-center py-2 border-b text-sm">
+                        <div>
+                            <p x-text="item.name"></p>
+                            <p class="text-gray-500 text-xs">Rp <span x-text="item.price"></span></p>
+                        </div>
+                        <button @click="removeFromCart(index)"
+                            class="text-red-500 hover:text-red-700 text-xs">✕</button>
+                    </div>
+                </template>
+                <p class="mt-3 font-semibold text-right">Total: Rp <span x-text="totalPrice()"></span></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Produk -->
+    <main class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <template x-for="product in products" :key="product.id">
+            <div class="bg-white p-4 rounded-xl shadow hover:shadow-lg transition-all transform hover:scale-105">
+                <img :src="product.image" alt="" class="w-full h-48 object-cover rounded mb-3" />
+                <h2 class="text-lg font-semibold" x-text="product.name"></h2>
+                <p class="text-gray-600 mb-3">Rp <span x-text="product.price"></span></p>
+                <p class="text-gray-600 mb-3">Note : <span x-text="product.note"></span></p>
+                <button @click="addToCart(product)"
+                    class="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg shadow hover:brightness-110 transition-all w-full">
+                    + Tambah ke Keranjang
+                </button>
+            </div>
+        </template>
+    </main>
+
+    <!-- Notifikasi -->
+    <div x-show="toast.visible" x-transition x-cloak
+        class="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-2 rounded shadow-lg" x-text="toast.message"></div>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-sm text-gray-500">
+        Dibuat oleh <strong>Fernanda</strong> • LAfern Store
+    </footer>
+
+    <!-- Alpine.js Logic -->
+    <script>
+        function store() {
+            return {
+                cartOpen: false,
+                cart: [],
+                toast: {
+                    visible: false,
+                    message: '',
+                    show(msg) {
+                        this.message = msg;
+                        this.visible = true;
+                        setTimeout(() => this.visible = false, 2500);
+                    }
+                },
+                products: [
+                    { id: 1, name: 'Rendi Ramdani', price: 200000, note: 'barang bagus, minusnya kadang Liar', image: 'assets/images/rendii.jpeg' },
+                    { id: 2, name: 'Fasya Ishaq', price: 450000, note: 'RARE, Penggendong handal Tim', image: 'assets/images/fasya.jpeg' },
+                    { id: 3, name: 'Fadlan Azka', price: 50000, note: 'Gairah seksual tinggi, over birahi', image: 'assets/images/fikar.jpeg' },
+                    { id: 4, name: 'Dzikri Azharwan', price: 200000, note: 'memiliki jiwa kepemimpinan, nyerenteng sedikit', image: 'assets/images/dzikri.jpeg' },
+                    { id: 5, name: 'Rian', price: 550000, note: 'sedikit punya jiwa ke Wibuan, Pengatur ritme Gameplay', image: 'assets/images/riyan.jpeg' },
+                    { id: 6, name: 'Ahmad', price: 150000, note: 'pemuda pantang menyerah, tidak berhenti sebelum WD', image: 'assets/images/ahmad.jpeg' },
+                    { id: 7, name: 'Daffa Ramdani', price: 350000, note: 'Barang langka, memilliki soft skill di atas rata - rata', image: 'assets/images/daffa.jpeg' },
+                    { id: 8, name: 'Yuri Arizqi', price: 300000, note: 'Sering bunyi, minusnya Bulat', image: 'assets/images/yuri.jpeg' }
+                ],
+                addToCart(product) {
+                    this.cart.push(product);
+                    this.toast.show(`✅ ${product.name} ditambahkan ke keranjang`);
+                },
+                removeFromCart(index) {
+                    const removed = this.cart[index];
+                    this.cart.splice(index, 1);
+                    this.toast.show(`❌ ${removed.name} dihapus dari keranjang`);
+                },
+                totalPrice() {
+                    return this.cart.reduce((sum, item) => sum + item.price, 0);
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
